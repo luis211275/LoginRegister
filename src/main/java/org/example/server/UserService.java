@@ -1,4 +1,4 @@
-package org.example;
+package org.example.server;
 
 import org.example.conection.ConnectionBBDD;
 
@@ -6,7 +6,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-public class Usuario {
+public class UserService {
     public void listarUsuarios() {
 
         // Definimos la consulta SQL que queremos ejecutar sobre la base de datos.
@@ -121,48 +121,34 @@ public class Usuario {
         return found;
     }
 
-    public void loginUser(){
-
-        System.out.println("====Iniciando login====");
-
-
+    public void validarLogin(String username, String password) {
+        String sql = "SELECT * FROM usuarios WHERE dni = ?";
+    }
 
 
+    public void validarRegister(){
 
     }
 
 
+//    public void insertarUsuario(int id, String nombre, String apellidos,String contraseña, String edad, String dni, String email, String telefono) {
+        public void insertarUsuario(String nombre, String apellidos,String contraseña) {
 
-    public void registerUser (){
-        System.out.println("====Iniciando registro====");
-
-    }
-
-
-
-
-
-
-
-
-
-
-
-    public void insertarUsuario(int id, String nombre, String apellidos,String contraseña, String edad, String dni, String email, String telefono) {
-        String sql = "INSERT INTO usuarios (id, nombre, apellidos, contraseña, edad, dni, email, telefono) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+//        String sql = "INSERT INTO usuarios (id, nombre, apellidos, contraseña, edad, dni, email, telefono) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO usuarios (nombre, apellidos, contraseña) VALUES (?, ?, ?)";
         boolean found = findByDni(dni);
         if (!found){
             try (Connection conn = ConnectionBBDD.getConnection();
                  PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-                stmt.setInt(1, id);
-                stmt.setString(2, nombre);
-                stmt.setString(3, apellidos);
-                stmt.setString(4, contraseña);
-                stmt.setString(5, edad);
-                stmt.setString(6, dni);
-                stmt.setString(7, email);
-                stmt.setString(8, telefono);
+//                stmt.setInt(1, id);
+                stmt.setString(1, nombre);
+                stmt.setString(2, apellidos);
+                stmt.setString(3, contraseña);
+//                stmt.setString(5, edad);
+//                stmt.setString(6, dni);
+//                stmt.setString(7, email);
+//                stmt.setString(8, telefono);
                 stmt.executeUpdate();
 
                 System.out.println("Usuario insertado: " + nombre);
