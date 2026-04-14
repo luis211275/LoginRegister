@@ -5,6 +5,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.sun.net.httpserver.HttpExchange;
+import org.example.server.UserService;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
@@ -46,9 +48,10 @@ public class UserController {
 
                     String nombre = json.get("nombre").getAsString();
                     String apellido = json.get("apellido").getAsString();
+                    String email = json.get("email").getAsString();
                     String password = json.get("password").getAsString();
 
-                    System.out.println(nombre + "-" + apellido + "-" + password);
+                    System.out.println(nombre + "-" + apellido + "-" + email + "-" + password);
 
                     JsonObject responseJson = new JsonObject();
                     responseJson.addProperty("status", "ok");
@@ -57,25 +60,27 @@ public class UserController {
                     sendResponse(exchange, 200, responseJson.toString());
 
 
-                }else if (path.equals("/user/register")) {
+
+                }
+
+                if (path.equals("/user/register")) {
                     String body = new String(
                             exchange.getRequestBody().readAllBytes(),
                             StandardCharsets.UTF_8
                     );
                     System.out.println(body);
-                    JsonObject json = JsonParser.parseString(body).getAsJsonObject();
-
-                    String nombre = json.get("nombre").getAsString();
-                    String apellido = json.get("apellido").getAsString();
-                    String password = json.get("password").getAsString();
-
-                    System.out.println(nombre + "-" + apellido + "-" + password);
 
                     JsonObject responseJson = new JsonObject();
+
+                    UserService usuario = new UserService();
+
+                    usuario.insertarUsuario(body);
+
+
                     responseJson.addProperty("status", "ok");
                     responseJson.addProperty("message", "Guardado correctamente");
 
-                    sendResponse(exchange, 200, responseJson.toString());
+                    sendResponse(exchange, 200, body);
                 }else{
                     sendResponse(exchange, 400, "Endpoint no valido");
                 }

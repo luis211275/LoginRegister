@@ -1,5 +1,7 @@
 package org.example.server;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.example.conection.ConnectionBBDD;
 
 import java.sql.Connection;
@@ -23,7 +25,7 @@ public class UserService {
             // Itera por cada fila devuelta por la consulta.
             while (rs.next()) {
                 // Obtiene los datos de cada columna ("id" y "nombre") y los imprime por consola.
-                System.out.println(rs.getInt("id") + " - " + rs.getString("nombre") + " - " + rs.getString("apellidos")+ " - " + rs.getString("contraseña") + "-" + rs.getString("edad")+ " - " + rs.getString("dni")+ " - " + rs.getString("email")+ " - " + rs.getString("telefono"));
+                System.out.println(rs.getString("nombre") + " - " + rs.getString("apellido")+ " - "+ rs.getString("email") + "-" + rs.getString("password") );
             }
 
         } catch (Exception e) {
@@ -63,24 +65,24 @@ public class UserService {
     }
 
 
-    public boolean findByPassword(String passwordBuscado) {
+    public boolean findByEmail(String emailBuscado) {
         boolean found = true;
-        String sql = "SELECT id, nombre FROM usuarios WHERE dni = ?";
+        String sql = "SELECT id_usuario, nombre FROM usuarios WHERE email = ?";
 
         try (Connection conn = ConnectionBBDD.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             // Sustituye el ? por el nombre que queremos buscar.
-            stmt.setString(1, passwordBuscado);
+            stmt.setString(1, emailBuscado);
 
             // Ejecuta la consulta SELECT.
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
                 // Si existe al menos un usuario con ese nombre...
-                System.out.println("Ya existe este password en la Base de datos pon otro");
+                System.out.println("Ya existe este email en la Base de datos pon otro");
             } else {
-                System.out.println("No existe ningún usuario con el password: " + passwordBuscado);
+                System.out.println("No existe ningún usuario con el email: " + emailBuscado);
                 found = false;
 
             }
@@ -121,6 +123,11 @@ public class UserService {
         return found;
     }
 
+
+
+
+
+
     public void validarLogin(String username, String password) {
         String sql = "SELECT * FROM usuarios WHERE dni = ?";
     }
@@ -131,20 +138,36 @@ public class UserService {
     }
 
 
+
+
+
+
 //    public void insertarUsuario(int id, String nombre, String apellidos,String contraseña, String edad, String dni, String email, String telefono) {
-        public void insertarUsuario(String nombre, String apellidos,String contraseña) {
+        public void insertarUsuario(String body) {
+
+
+
+            JsonObject json = JsonParser.parseString(body).getAsJsonObject();
+
+            String nombre = json.get("nombre").getAsString();
+            String apellido = json.get("apellido").getAsString();
+            String email = json.get("email").getAsString();
+            String password = json.get("password").getAsString();
 
 //        String sql = "INSERT INTO usuarios (id, nombre, apellidos, contraseña, edad, dni, email, telefono) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-            String sql = "INSERT INTO usuarios (nombre, apellidos, contraseña) VALUES (?, ?, ?)";
-        boolean found = findByDni(dni);
+            String sql = "INSERT INTO usuarios ( nombre, apellido, email, password) VALUES (?, ?, ?, ?)";
+        boolean found = findByEmail(email);
         if (!found){
+            System.out.println("insertar");
             try (Connection conn = ConnectionBBDD.getConnection();
                  PreparedStatement stmt = conn.prepareStatement(sql)) {
 
 //                stmt.setInt(1, id);
+
                 stmt.setString(1, nombre);
-                stmt.setString(2, apellidos);
-                stmt.setString(3, contraseña);
+                stmt.setString(2, apellido);
+                stmt.setString(3, email);
+                stmt.setString(4, password);
 //                stmt.setString(5, edad);
 //                stmt.setString(6, dni);
 //                stmt.setString(7, email);
